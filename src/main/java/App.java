@@ -12,11 +12,13 @@ public class App
     private SiteFileLoaderInterface siteFileLoader;
     private RouteContainer routeContainer = new RouteContainer();
 
+    private final static String DEFAULT_INPUT_SITE_FILE_NAME = System.getProperty("user.dir") + "/example_input";
+
     public static void main( String[] args )
     {
         App app = new App();
         // load input file and init route engine
-        String routeFilePath = "";
+        String routeFilePath = DEFAULT_INPUT_SITE_FILE_NAME;
         if (args.length > 0) {
             routeFilePath = args[0];
         }
