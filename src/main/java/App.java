@@ -12,7 +12,8 @@ public class App
     private SiteFileLoaderInterface siteFileLoader;
     private RouteContainer routeContainer = new RouteContainer();
 
-    private final static String DEFAULT_INPUT_SITE_FILE_NAME = System.getProperty("user.dir") + "/example_input";
+    private final static String DEFAULT_INPUT_SITE_FILE_NAME =
+            App.class.getClassLoader().getResource("./").getPath() + "/example_input.txt";
 
     public static void main( String[] args )
     {
