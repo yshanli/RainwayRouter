@@ -4,9 +4,7 @@ import route.module.Route;
 import route.module.RouteContainer;
 import route.utils.TripParser;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Engine {
     private RouteContainer routeContainer;
@@ -22,12 +20,11 @@ public class Engine {
             return 0;
         }
         int distance = 0;
+
         for (int i = 0; i < tripSites.size() - 1; i++) {
-            Route route = this.routeContainer.getRoute(tripSites.get(i), tripSites.get(i + 1));
-            if (route != null) {
-                distance += route.distance;
-            } else {
-                distance = 0;
+            Optional<Route> route = this.routeContainer.getRoute(tripSites.get(i), tripSites.get(i + 1));
+            distance += route.orElse(new Route()).distance;
+            if (distance == 0) {
                 break;
             }
         }
@@ -41,7 +38,8 @@ public class Engine {
             return foundTripSitesStr;
         }
 
-        findNextSiteByMaxStop(routeContainer.getRoute(startingSite), startingSite, endingSite, maxStop, foundTripSitesStr);
+        Map<String, Route> nextPossibleRoutes = routeContainer.getRoute(startingSite).orElse(new HashMap<>());
+        findNextSiteByMaxStop(nextPossibleRoutes, startingSite, endingSite, maxStop, foundTripSitesStr);
         return foundTripSitesStr;
     }
 
@@ -58,18 +56,18 @@ public class Engine {
             String fullSitesStr = tripSitesStr + "-" + endingSite;
             foundTripSitesStr.add(fullSitesStr);
         } else {
-            for (Map.Entry<String, Route> entry : nextPossibleRoutes.entrySet()) {
-                if (entry.getKey().equals(endingSite)) {
+            nextPossibleRoutes.forEach((key, value) -> {
+                if (key.equals(endingSite)) {
                     String fullSitesStr = tripSitesStr + "-" + endingSite;
                     foundTripSitesStr.add(fullSitesStr);
                 } else {
-                    findNextSiteByMaxStop(routeContainer.getRoute(entry.getKey()),
-                            tripSitesStr + "-" + entry.getKey(),
+                    findNextSiteByMaxStop(routeContainer.getRoute(key).orElse(new HashMap<>()),
+                            tripSitesStr + "-" + key,
                             endingSite,
                             maxStop - 1,
                             foundTripSitesStr);
                 }
-            }
+            });
         }
 
     }
@@ -80,7 +78,7 @@ public class Engine {
             return foundTripSitesStr;
         }
 
-        findNextSiteByExactMaxStop(routeContainer.getRoute(startingSite), startingSite, endingSite, exactMaxStop, foundTripSitesStr);
+        findNextSiteByExactMaxStop(routeContainer.getRoute(startingSite).orElse(new HashMap<>()), startingSite, endingSite, exactMaxStop, foundTripSitesStr);
         return foundTripSitesStr;
     }
 
@@ -97,13 +95,12 @@ public class Engine {
             String fullSitesStr = tripSitesStr + "-" + endingSite;
             foundTripSitesStr.add(fullSitesStr);
         } else {
-            for (Map.Entry<String, Route> entry : nextPossibleRoutes.entrySet()) {
-                findNextSiteByExactMaxStop(routeContainer.getRoute(entry.getKey()),
-                        tripSitesStr + "-" + entry.getKey(),
-                        endingSite,
-                        remainStops - 1,
-                        foundTripSitesStr);
-            }
+            nextPossibleRoutes.forEach((key, value) ->
+                    findNextSiteByExactMaxStop(routeContainer.getRoute(key).orElse(new HashMap<>()),
+                    tripSitesStr + "-" + key,
+                    endingSite,
+                    remainStops - 1,
+                    foundTripSitesStr));
         }
     }
 
@@ -146,7 +143,7 @@ public class Engine {
             return foundTripSitesStr;
         }
 
-        findNextSiteByMaxDistance(routeContainer.getRoute(startingSite), startingSite, endingSite, maxDistance, foundTripSitesStr);
+        findNextSiteByMaxDistance(routeContainer.getRoute(startingSite).orElse(new HashMap<>()), startingSite, endingSite, maxDistance, foundTripSitesStr);
         return  foundTripSitesStr;
     }
 
@@ -159,28 +156,29 @@ public class Engine {
             return;
         }
 
-        for (Map.Entry<String, Route> entry : nextPossibleRoutes.entrySet()) {
-            if (entry.getKey().equals(endingSite)) {
+        nextPossibleRoutes.forEach((key, vlaue) -> {
+            if (key.equals(endingSite)) {
                 String fullSitesStr = tripSitesStr + "-" + endingSite;
                 if (maxDistance - this.calculateDistance(fullSitesStr) > 0) {
                     foundTripSitesStr.add(fullSitesStr);
 
-                    findNextSiteByMaxDistance(routeContainer.getRoute(endingSite),
+                    findNextSiteByMaxDistance(routeContainer.getRoute(endingSite).orElse(new HashMap<>()),
                             fullSitesStr,
                             endingSite,
                             maxDistance,
                             foundTripSitesStr);
                 }
             } else {
-                String fullSitesStr = tripSitesStr + "-" + entry.getKey();
+                String fullSitesStr = tripSitesStr + "-" + key;
                 if (maxDistance - this.calculateDistance(fullSitesStr) > 0) {
-                    findNextSiteByMaxDistance(routeContainer.getRoute(entry.getKey()),
+                    findNextSiteByMaxDistance(routeContainer.getRoute(key).orElse(new HashMap<>()),
                             fullSitesStr,
                             endingSite,
                             maxDistance,
                             foundTripSitesStr);
                 }
             }
-        }
+
+        });
     }
 }

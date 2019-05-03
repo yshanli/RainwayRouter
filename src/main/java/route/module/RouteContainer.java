@@ -51,7 +51,7 @@ public class RouteContainer {
         if (this.find(from)){
             return Optional.of(siteRoutesMap.get(from));
         } else {
-            return Optional.of(new HashMap<>());
+            return Optional.empty();
         }
     }
 

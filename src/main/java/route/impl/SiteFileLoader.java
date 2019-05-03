@@ -18,15 +18,10 @@ public class SiteFileLoader implements SiteFileLoaderInterface {
         this.routeContainer = routeContainer;
         this.routeBuilder = routeBuilder;
     }
-    private static final String DEFAULT_INPUT_FILE_PATH  = System.getProperty("user.dir") + "/example_input.txt";
 
     public void loadSiteFile(String inputFilePath) {
-        String targetFilePath = DEFAULT_INPUT_FILE_PATH;
-        if (inputFilePath != null && !inputFilePath.isEmpty()) {
-            targetFilePath = inputFilePath;
-        }
 
-        File inputFile = new File(targetFilePath);
+        File inputFile = new File(inputFilePath);
         try{
             BufferedReader br = new BufferedReader(new FileReader(inputFile));//构造一个BufferedReader类来读取文件
             String str;

@@ -11,6 +11,12 @@ public class Route {
         this.distance = distance;
     }
 
+    public Route(){
+        this.from = "";
+        this.to = "";
+        this.distance = 0;
+    }
+
     @Override
     public String toString() {
         return "Route from " + this.from + ",to " + this.to + ",distance " + this.distance;

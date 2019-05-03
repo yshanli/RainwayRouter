@@ -4,6 +4,7 @@ import route.impl.SiteFileLoader;
 import route.module.RouteContainer;
 import route.utils.RouteBuilder;
 
+import java.io.File;
 import java.util.List;
 
 public class App
@@ -13,7 +14,8 @@ public class App
     private RouteContainer routeContainer = new RouteContainer();
 
     private final static String DEFAULT_INPUT_SITE_FILE_NAME =
-            App.class.getClassLoader().getResource("./").getPath() + "/example_input.txt";
+            App.class.getResource("example_input.txt").getPath();
+            //App.class.getClassLoader().getResource("./").getPath() + "example_input.txt";
 
     public static void main( String[] args )
     {
@@ -23,6 +25,12 @@ public class App
         if (args.length > 0) {
             routeFilePath = args[0];
         }
+
+        File file = new File(DEFAULT_INPUT_SITE_FILE_NAME);
+        if (!file.exists()){
+            System.out.println("input file: " + DEFAULT_INPUT_SITE_FILE_NAME + " DOES NOT exist");
+            return;
+        }
         app.init(routeFilePath);
 
         // run test
@@ -30,6 +38,7 @@ public class App
     }
 
     private void init(String routeFilePath){
+        System.out.println("routeFilePath is " + routeFilePath);
         this.siteFileLoader = new SiteFileLoader(this.routeContainer, new RouteBuilder());
         this.siteFileLoader.loadSiteFile(routeFilePath);
 
